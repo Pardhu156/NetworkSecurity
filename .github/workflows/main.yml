@@ -24,7 +24,6 @@ jobs:
 
   build-and-push-ecr-image:
     name: Continuous Delivery
-
     needs: integration
     runs-on: ubuntu-latest
 
@@ -39,7 +38,6 @@ jobs:
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
-
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -51,16 +49,15 @@ jobs:
 
       - name: Build, Tag, and Push Image to Amazon ECR
         id: build-image
-
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
           IMAGE_TAG: latest
-
-        run: 
+        run: |
           # Build a docker container
-          # push the docker container to ECR to deploy in ECS
-          
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+
+          # Push the docker container to ECR
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
